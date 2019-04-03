@@ -1,28 +1,50 @@
 
 
 (function () {
-    let url = 'https://api.icndb.com/jokes/random';
+   let prefix = "https://cors-anywhere.herokuapp.com/";
+   let tweetLink = "https://twitter.com/intent/tweet?text=";
+   let quoteUrl = "https://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1";
 
-    let button = document.getElementById('get-joke');
+   function getQuote() {
+        fetch( prefix + quoteUrl, { cache: "no-store" })
+            .then(function(resp) {
+                return resp.json();
+            })
+            .then(createTweet);
+   }
 
+   function createTweet(input) {
 
-    document.addEventListener('DOMContentLoaded',function () {
-        getJoke();
-    });
+       let data = input[0];
+       let dataElement = document.createElement('div');
+       dataElement.innerHTML = data.content;
+       let quoteText = dataElement.innerText.trim();
+       let quoteAuthor = data.title;
 
-    button.addEventListener('click', function(){
-        getJoke();
-    });
+       if (!quoteAuthor.length) {
+           quoteAuthor = "Unknown author";
+       }
 
-    let paragraph = document.getElementById('joke');
+       let tweetText = "Quote of the day - " + quoteText + " Author: " + quoteAuthor;
 
-    function getJoke() {
-    let xhr = new XMLHttpRequest();
-        xhr.open('GET', url);
-        xhr.addEventListener('load', function(){
-            let response = JSON.parse(xhr.response);
-            paragraph.innerHTML = response.value.joke;
+       if (tweetText.length > 140) {
+           getQuote();
+       } else {
+           let tweet = tweetLink + encodeURIComponent(tweetText);
+           console.log(tweet)
+           document.querySelector('.quote').innerText = quoteText;
+           document.querySelector('.author').innerText = "Author: " + quoteAuthor;
+           document.querySelector('.tweet').setAttribute('href', tweet);
+       }
+
+   }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        getQuote();
+        document.getElementById('trigger').addEventListener('click', function() {
+            getQuote();
         });
-        xhr.send();
-    }
+    });
+
+
 })();
