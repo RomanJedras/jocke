@@ -1,7 +1,7 @@
 
 
 (function () {
-    let url = 'http://api.icndb.com/jokes/random';
+    let url = 'https://api.icndb.com/jokes/random';
 
     let button = document.getElementById('get-joke');
 
